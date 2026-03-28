@@ -1,0 +1,4 @@
+logs/*.txt
+*.bat
+test_*.php
+.DS_Store
