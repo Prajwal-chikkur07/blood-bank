@@ -1,5 +1,4 @@
 <?php
-// DB init - all errors suppressed so page always renders
 $donor_count = 0; $donated = 0; $conn = null;
 try {
     $host = getenv('MYSQLHOST') ?: getenv('DB_HOST') ?: 'localhost';
@@ -9,12 +8,10 @@ try {
     $port = (int)(getenv('MYSQLPORT') ?: 3306);
     $conn = @mysqli_connect($host, $user, $pass, $name, $port);
     if ($conn) {
-        $r1 = mysqli_query($conn, "SELECT COUNT(*) FROM donors");
-        if ($r1) $donor_count = (int)mysqli_fetch_array($r1)[0];
-        $r2 = mysqli_query($conn, "SELECT COUNT(*) FROM donors WHERE status='Donated'");
-        if ($r2) $donated = (int)mysqli_fetch_array($r2)[0];
+        $donor_count = (int)mysqli_fetch_array(mysqli_query($conn, "SELECT COUNT(*) FROM donors"))[0];
+        $donated = (int)mysqli_fetch_array(mysqli_query($conn, "SELECT COUNT(*) FROM donors WHERE status='Donated'"))[0];
     }
-} catch (Exception $e) { /* silent fail */ }
+} catch (Exception $e) {}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -236,7 +233,7 @@ try {
     <div class="blood-grid">
         <?php foreach(['A+','A-','B+','B-','O+','O-','AB+','AB-'] as $g):
             $c = 0;
-            if ($conn) { $rc = mysqli_query($conn, "SELECT COUNT(*) FROM donors WHERE blood_group='$g' AND status IN ('Approved','Donated')"); if ($rc) $c = mysqli_fetch_array($rc)[0]; }
+            if ($conn) { $rc = @mysqli_query($conn, "SELECT COUNT(*) FROM donors WHERE blood_group='$g' AND status IN ('Approved','Donated')"); if ($rc) $c = (int)mysqli_fetch_array($rc)[0]; }
         ?>
         <div class="blood-card">
             <div class="blood-type"><?php echo $g; ?></div>
