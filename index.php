@@ -1,3 +1,21 @@
+<?php
+// DB init - all errors suppressed so page always renders
+$donor_count = 0; $donated = 0; $conn = null;
+try {
+    $host = getenv('MYSQLHOST') ?: getenv('DB_HOST') ?: 'localhost';
+    $user = getenv('MYSQLUSER') ?: getenv('DB_USER') ?: 'root';
+    $pass = getenv('MYSQLPASSWORD') ?: getenv('DB_PASSWORD') ?: '';
+    $name = getenv('MYSQLDATABASE') ?: getenv('DB_NAME') ?: 'bloodbank';
+    $port = (int)(getenv('MYSQLPORT') ?: 3306);
+    $conn = @mysqli_connect($host, $user, $pass, $name, $port);
+    if ($conn) {
+        $r1 = mysqli_query($conn, "SELECT COUNT(*) FROM donors");
+        if ($r1) $donor_count = (int)mysqli_fetch_array($r1)[0];
+        $r2 = mysqli_query($conn, "SELECT COUNT(*) FROM donors WHERE status='Donated'");
+        if ($r2) $donated = (int)mysqli_fetch_array($r2)[0];
+    }
+} catch (Exception $e) { /* silent fail */ }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -169,16 +187,6 @@
             </a>
         </div>
         <div class="hero-stats">
-            <?php
-            include(__DIR__ . "/config/db.php");
-            $donor_count = 0; $donated = 0;
-            if ($conn) {
-                $r1 = mysqli_query($conn, "SELECT COUNT(*) FROM donors");
-                if ($r1) $donor_count = mysqli_fetch_array($r1)[0];
-                $r2 = mysqli_query($conn, "SELECT COUNT(*) FROM donors WHERE status='Donated'");
-                if ($r2) $donated = mysqli_fetch_array($r2)[0];
-            }
-            ?>
             <div class="stat">
                 <span class="stat-num"><?php echo $donor_count > 0 ? $donor_count.'+' : '500+'; ?></span>
                 <span class="stat-label">Registered Donors</span>
