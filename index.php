@@ -48,7 +48,7 @@
         .stat-num{font-size:1.8rem;font-weight:800;color:var(--navy);letter-spacing:-.03em}
         .stat-label{font-size:.85rem;color:var(--muted);font-weight:500}
         .stat-divider{width:1px;background:var(--border);align-self:stretch}
-        .hero-visual{flex:1;min-width:300px;position:relative;display:flex;justify-content:center;align-items:center}
+        .hero-visual{flex:1;min-width:300px;min-height:400px;position:relative;display:flex;justify-content:center;align-items:center}
         .hero-img-wrap{position:relative;width:100%;max-width:520px}
         .hero-img-wrap img{width:100%;border-radius:24px;box-shadow:0 32px 80px rgba(0,0,0,.15);display:block}
         .hero-float-card{position:absolute;background:#fff;border-radius:14px;padding:1rem 1.25rem;box-shadow:0 8px 32px rgba(0,0,0,.12);display:flex;align-items:center;gap:.75rem;font-weight:600;font-size:.9rem;color:var(--navy)}
@@ -170,9 +170,14 @@
         </div>
         <div class="hero-stats">
             <?php
-            include("config/db.php");
-            $donor_count = mysqli_fetch_array(mysqli_query($conn, "SELECT COUNT(*) FROM donors"))[0];
-            $donated = mysqli_fetch_array(mysqli_query($conn, "SELECT COUNT(*) FROM donors WHERE status='Donated'"))[0];
+            include(__DIR__ . "/config/db.php");
+            $donor_count = 0; $donated = 0;
+            if ($conn) {
+                $r1 = mysqli_query($conn, "SELECT COUNT(*) FROM donors");
+                if ($r1) $donor_count = mysqli_fetch_array($r1)[0];
+                $r2 = mysqli_query($conn, "SELECT COUNT(*) FROM donors WHERE status='Donated'");
+                if ($r2) $donated = mysqli_fetch_array($r2)[0];
+            }
             ?>
             <div class="stat">
                 <span class="stat-num"><?php echo $donor_count > 0 ? $donor_count.'+' : '500+'; ?></span>
@@ -222,7 +227,8 @@
     <p class="section-sub">No matter your blood group, your donation is valuable. Every type is needed to save lives.</p>
     <div class="blood-grid">
         <?php foreach(['A+','A-','B+','B-','O+','O-','AB+','AB-'] as $g):
-            $c = mysqli_fetch_array(mysqli_query($conn, "SELECT COUNT(*) FROM donors WHERE blood_group='$g' AND status IN ('Approved','Donated')"))[0];
+            $c = 0;
+            if ($conn) { $rc = mysqli_query($conn, "SELECT COUNT(*) FROM donors WHERE blood_group='$g' AND status IN ('Approved','Donated')"); if ($rc) $c = mysqli_fetch_array($rc)[0]; }
         ?>
         <div class="blood-card">
             <div class="blood-type"><?php echo $g; ?></div>
