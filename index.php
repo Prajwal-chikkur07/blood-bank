@@ -27,7 +27,7 @@
                 </svg>
             </button>
             <!-- Mobile dropdown menu -->
-            <div id="mobile-nav-menu">
+            <div id="mobile-nav-menu" style="display:none;">
                 <a href="login.php" class="btn btn-outline" style="width:100%; justify-content:center;">Admin Login</a>
                 <a href="#emergency" class="btn btn-primary" style="background:var(--error); width:100%; justify-content:center;">Emergency</a>
                 <a href="donor/register.php" class="btn btn-primary" style="width:100%; justify-content:center;">Donate Now</a>
